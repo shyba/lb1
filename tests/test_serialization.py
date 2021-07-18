@@ -1,5 +1,5 @@
 import unittest
-from lb1miner.serialization import RXStatusPacket, RXNoncePacket
+from lb1miner.serialization import RXStatusPacket, RXNoncePacket, RXJobResultPacket
 
 
 class SerializationTestCase(unittest.TestCase):
@@ -25,7 +25,6 @@ class SerializationTestCase(unittest.TestCase):
     def test_rx_none(self):
         packet = RXNoncePacket.unpack(
             bytes.fromhex('a53c9651101200000011010511dba0d13a0000000069c35a'))
-        print(packet)
         self.assertEqual(packet.length, 18)
         self.assertEqual(packet.job_id, 17)
         self.assertEqual(packet.chip_id, 1)
@@ -33,6 +32,13 @@ class SerializationTestCase(unittest.TestCase):
         self.assertEqual(packet.nonce, 252625083153)
         self.assertEqual(packet.has_hash, False)
         self.assertEqual(packet.hash, b'')
+
+    def test_rx_job_result(self):
+        packet = RXJobResultPacket.unpack(
+            bytes.fromhex('a53c965510070000001569c35a'))
+        self.assertEqual(packet.length, 7)
+        self.assertEqual(packet.data, b'\x15')
+
 
 
 

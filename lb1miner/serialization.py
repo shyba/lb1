@@ -76,7 +76,29 @@ class RXNoncePacket(Packet):
         if payload[20] == 0:
             packet.has_hash = False
             (packet.length, packet.job_id, packet.chip_id, packet.core_id, packet.nonce) = cls.parser.unpack(payload[5:20])
+        else:
+            raise NotImplemented('need a sample')
         return packet
+
+    def pack(self):
+        raise NotImplemented("this packet comes from the device, packing not supported")
+
+
+@dataclass
+class RXJobResultPacket(Packet):
+    type: int = 0x55
+    version: int = 0x10
+    length: int = 0
+    data: bytes = b''
+    parser = Struct('<I')
+
+    @classmethod
+    def unpack(cls, payload: bytes):
+        assert payload[:3] == cls.preamble
+        assert payload[-3:] == cls.finalizer
+        assert payload[3] == cls.type
+        assert payload[4] == cls.version
+        return cls(0x55, 0x10, *cls.parser.unpack(payload[5:9]), data=payload[9:-3])
 
     def pack(self):
         raise NotImplemented("this packet comes from the device, packing not supported")
