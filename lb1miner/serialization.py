@@ -43,11 +43,7 @@ class RXStatusPacket(Packet):
         assert payload[-3:] == cls.finalizer
         assert payload[3] == cls.type
         assert payload[4] == cls.version
-        packet = cls()
-        (packet.length, packet.chips, packet.cores, packet.good_cores, packet.scanbits, packet.scantime, packet.voltage,
-         packet.freq, packet.mode, packet.temp, packet.reboot_count, packet.tempwarn, packet.fanwarn, packet.powerwarn,
-         packet.rpm) = cls.parser.unpack(payload[5:-3])
-        return packet
+        return cls(cls.type, cls.version, *cls.parser.unpack(payload[5:-3]))
 
     def pack(self):
         raise NotImplemented("this packet comes from the device, packing not supported")
@@ -72,10 +68,8 @@ class RXNoncePacket(Packet):
         assert payload[-3:] == cls.finalizer
         assert payload[3] == cls.type
         assert payload[4] == cls.version
-        packet = cls()
         if payload[20] == 0:
-            packet.has_hash = False
-            (packet.length, packet.job_id, packet.chip_id, packet.core_id, packet.nonce) = cls.parser.unpack(payload[5:20])
+            return cls(0x51, 0x10, *cls.parser.unpack(payload[5:20]), has_hash=False)
         else:
             raise NotImplemented('need a sample')
         return packet
