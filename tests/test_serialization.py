@@ -1,5 +1,5 @@
 import unittest
-from lb1miner.serialization import RXStatusPacket, RXNoncePacket, RXJobResultPacket
+from lb1miner.serialization import RXStatusPacket, RXNoncePacket, RXJobResultPacket, TXJobDataPacket
 
 
 class SerializationTestCase(unittest.TestCase):
@@ -39,8 +39,23 @@ class SerializationTestCase(unittest.TestCase):
         self.assertEqual(packet.length, 7)
         self.assertEqual(packet.data, b'\x15')
 
-
-
+    def test_tx_job_data(self):
+        hex_packet = ('a53c96a110a800000033333333000000000000000000000000ffffffff000000000114d5'
+                      'dd71f755c9c0b50797e00f79138988b3bcd9f30cbfde5b353e85ed4dce1619bbf591836c'
+                      '15ea896f251a39ece0d590bede24d28c843b9d6d0db82346735ed0e98e4dd1b30aee60c3'
+                      '7b011a000000000000000000000000000000000000000000000000000000000000000000'
+                      '00000000000000000000000000000000000000000000000000000069c35a')
+        packet = TXJobDataPacket.unpack(bytes.fromhex(hex_packet))
+        self.assertEqual(packet.length, 168)
+        self.assertEqual(packet.target, 858993459)
+        self.assertEqual(packet.start_nonce, 0)
+        self.assertEqual(packet.end_nonce, 4294967295)
+        self.assertEqual(packet.job_num, 1)
+        self.assertEqual(packet.job_id, 20)
+        self.assertIn(packet.job_data.hex(), hex_packet)
+        self.assertEqual(hex_packet, packet.pack().hex())
+        packet.length = 0
+        self.assertEqual(hex_packet, packet.pack().hex())
 
 
 if __name__ == '__main__':

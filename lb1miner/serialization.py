@@ -96,3 +96,34 @@ class RXJobResultPacket(Packet):
 
     def pack(self):
         raise NotImplemented("this packet comes from the device, packing not supported")
+
+
+@dataclass
+class TXJobDataPacket(Packet):
+    type: int = 0xA1
+    version: int = 0x10
+    length: int = 0
+    target: int = 0
+    start_nonce: int = 0
+    end_nonce: int = 0
+    job_num: int = 0
+    job_id: int = 0
+    job_data: bytes = b''
+    parser = Struct('<BBIQQQBB')
+
+    @classmethod
+    def unpack(cls, payload: bytes):
+        assert payload[:3] == cls.preamble
+        assert payload[-3:] == cls.finalizer
+        assert payload[3] == cls.type
+        assert payload[4] == cls.version
+        return cls(*cls.parser.unpack(payload[3:35]), job_data=payload[35:-3])
+
+    def pack(self):
+        self.length = len(self.job_data) + 32
+        return b''.join(
+            [self.preamble,
+             self.parser.pack(self.type, self.version, self.length, self.target, self.start_nonce, self.end_nonce,
+                              self.job_num, self.job_id),
+             self.job_data,
+             self.finalizer])
