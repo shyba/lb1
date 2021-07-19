@@ -176,6 +176,8 @@ class TXDeviceParametersPacket(Packet):
     mode: int = 0
     temp: int = 0
     parser = Struct('<BBIBHHIB')
+    QUERY = 0x52
+    SET = 0xA2
 
     @classmethod
     def unpack(cls, payload: bytes):
@@ -183,22 +185,22 @@ class TXDeviceParametersPacket(Packet):
         assert payload[-3:] == cls.finalizer
         assert payload[3] == cls.type
         assert payload[4] == cls.version
-        if payload[9] == 0x52:
+        if payload[9] == cls.QUERY:
             return cls(cls.type, cls.version, int.from_bytes(payload[5:8], 'little', signed=False), 0x52)
-        elif payload[9] == 0xA2:
+        elif payload[9] == cls.SET:
             return cls(*cls.parser.unpack(payload[3:-3]))
         else:
             raise NotImplemented(f'{hex(payload[9])} is not a known flag')
 
     def pack(self):
-        if self.flag == 0x52:
+        if self.flag == self.QUERY:
             self.length = 7
             return b''.join(
                 [self.preamble,
                  self.parser.pack(self.type, self.version, self.length, self.flag, self.voltage, self.freq, self.mode,
                                   self.temp)[:7],
                  self.finalizer])
-        elif self.flag == 0xA2:
+        elif self.flag == self.SET:
             self.length = 16
             return b''.join(
                 [self.preamble,
