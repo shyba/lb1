@@ -229,6 +229,26 @@ class TXQueryDeviceInformationPacket(Packet):
         return b''.join([self.preamble, self.parser.pack(self.type, self.version, self.length), self.finalizer])
 
 
+@dataclass
+class TXRestartPacket(Packet):
+    type: int = 0xAC
+    version: int = 0x10
+    length: int = 6
+    parser = Struct('<BBI')
+
+    @classmethod
+    def unpack(cls, payload: bytes):
+        assert payload[:3] == cls.preamble
+        assert payload[-3:] == cls.finalizer
+        assert payload[3] == cls.type
+        assert payload[4] == cls.version
+        return cls(*cls.parser.unpack(payload[3:-3]))
+
+    def pack(self):
+        self.length = self.length or 6
+        return b''.join([self.preamble, self.parser.pack(self.type, self.version, self.length), self.finalizer])
+
+
 DESERIALIZERS = {
     RXStatusPacket.type: RXStatusPacket,
     RXNoncePacket.type: RXNoncePacket,
@@ -236,5 +256,6 @@ DESERIALIZERS = {
     RXDeviceInformationPacket.type: RXDeviceInformationPacket,
     TXJobDataPacket.type: TXJobDataPacket,
     TXDeviceParametersPacket.type: TXDeviceParametersPacket,
-    TXQueryDeviceInformationPacket.type: TXQueryDeviceInformationPacket
+    TXQueryDeviceInformationPacket.type: TXQueryDeviceInformationPacket,
+    TXRestartPacket.type: TXRestartPacket
 }
