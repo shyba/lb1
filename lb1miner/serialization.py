@@ -119,8 +119,8 @@ class RXJobResultPacket(Packet):
     type: int = 0x55
     version: int = 0x10
     length: int = 0
-    data: bytes = b''
-    parser = Struct('<I')
+    job_id: int = 0
+    parser = Struct('<IB')
 
     @classmethod
     def unpack(cls, payload: bytes):
@@ -128,7 +128,7 @@ class RXJobResultPacket(Packet):
         assert payload[-3:] == cls.finalizer
         assert payload[3] == cls.type
         assert payload[4] == cls.version
-        return cls(0x55, 0x10, *cls.parser.unpack(payload[5:9]), data=payload[9:-3])
+        return cls(0x55, 0x10, *cls.parser.unpack(payload[5:10]))
 
     def pack(self):
         raise NotImplemented("this packet comes from the device, packing not supported")

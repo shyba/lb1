@@ -51,7 +51,7 @@ class SerializationTestCase(unittest.TestCase):
         packet = RXJobResultPacket.unpack(
             bytes.fromhex('a53c965510070000001569c35a'))
         self.assertEqual(packet.length, 7)
-        self.assertEqual(packet.data, b'\x15')
+        self.assertEqual(packet.job_id, 0x15)  # or 21
 
     def test_tx_job_data(self):
         hex_packet = ('a53c96a110a800000033333333000000000000000000000000ffffffff000000000114d5'
