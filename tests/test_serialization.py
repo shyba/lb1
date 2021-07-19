@@ -1,6 +1,6 @@
 import unittest
 from lb1miner.serialization import RXStatusPacket, RXNoncePacket, RXJobResultPacket, TXJobDataPacket, \
-    TXDeviceParametersPacket
+    TXDeviceParametersPacket, TXQueryDeviceInformationPacket
 
 
 class SerializationTestCase(unittest.TestCase):
@@ -71,7 +71,7 @@ class SerializationTestCase(unittest.TestCase):
         packet.length = 0
         self.assertEqual(hex_packet, packet.pack().hex())
 
-    def test_tx_device_parameters(self):
+    def test_tx_device_parameters_full_flag(self):
         hex_packet = 'a53c96a21010000000a2ae01ee02000000005069c35a'
         packet = TXDeviceParametersPacket.unpack(bytes.fromhex(hex_packet))
         self.assertEqual(packet.length, 16)
@@ -80,6 +80,14 @@ class SerializationTestCase(unittest.TestCase):
         self.assertEqual(packet.freq, 750)
         self.assertEqual(packet.mode, 0)
         self.assertEqual(packet.temp, 80)
+        self.assertEqual(hex_packet, packet.pack().hex())
+        packet.length = 0
+        self.assertEqual(hex_packet, packet.pack().hex())
+
+    def test_tx_query_device_information(self):
+        hex_packet = 'a53c96a4100600000069c35a'
+        packet = TXQueryDeviceInformationPacket.unpack(bytes.fromhex(hex_packet))
+        self.assertEqual(packet.length, 6)
         self.assertEqual(hex_packet, packet.pack().hex())
         packet.length = 0
         self.assertEqual(hex_packet, packet.pack().hex())
