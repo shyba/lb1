@@ -55,6 +55,37 @@ class RXStatusPacket(Packet):
 
 
 @dataclass
+class RXDeviceInformationPacket(Packet):
+    type: int = 0x54
+    version: int = 0x10
+    length: int = 0
+    model_name_length: int = 0
+    model_name: bytes = b''
+    firmware_version_length: int = 0
+    firmware_version: bytes = b''
+    serial_number: bytes = b''
+    work_depth: int = 0
+    parser = Struct('<BBIB16sB8s21sB')
+
+    @classmethod
+    def unpack(cls, payload: bytes):
+        assert payload[:3] == cls.preamble
+        assert payload[-3:] == cls.finalizer
+        assert payload[3] == cls.type
+        assert payload[4] == cls.version
+        return cls(*cls.parser.unpack(payload[3:-3]))
+        offset = 10 + packet.model_name_length
+        packet.model_name = payload[10:offset]
+        packet.firmware_version_length = payload[offset + 1]
+        packet.firmware_version = payload[(offset+1):(offset+packet.firmware_version_length)]
+        offset += payload[offset]
+        return packet
+
+    def pack(self):
+        raise NotImplemented("this packet comes from the device, packing not supported")
+
+
+@dataclass
 class RXNoncePacket(Packet):
     type: int = 0x51
     version: int = 0x10
@@ -202,6 +233,7 @@ DESERIALIZERS = {
     RXStatusPacket.type: RXStatusPacket,
     RXNoncePacket.type: RXNoncePacket,
     RXJobResultPacket.type: RXJobResultPacket,
+    RXDeviceInformationPacket.type: RXDeviceInformationPacket,
     TXJobDataPacket.type: TXJobDataPacket,
     TXDeviceParametersPacket.type: TXDeviceParametersPacket,
     TXQueryDeviceInformationPacket.type: TXQueryDeviceInformationPacket
