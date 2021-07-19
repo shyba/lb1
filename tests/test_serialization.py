@@ -71,6 +71,19 @@ class SerializationTestCase(unittest.TestCase):
         packet.length = 0
         self.assertEqual(hex_packet, packet.pack().hex())
 
+    def test_tx_device_parameters(self):
+        hex_packet = 'a53c96a21010000000a2ae01ee02000000005069c35a'
+        packet = TXDeviceParametersPacket.unpack(bytes.fromhex(hex_packet))
+        self.assertEqual(packet.length, 16)
+        self.assertEqual(packet.flag, 0xA2)
+        self.assertEqual(packet.voltage, 430)
+        self.assertEqual(packet.freq, 750)
+        self.assertEqual(packet.mode, 0)
+        self.assertEqual(packet.temp, 80)
+        self.assertEqual(hex_packet, packet.pack().hex())
+        packet.length = 0
+        self.assertEqual(hex_packet, packet.pack().hex())
+
 
 if __name__ == '__main__':
     unittest.main()

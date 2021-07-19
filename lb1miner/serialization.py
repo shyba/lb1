@@ -2,6 +2,11 @@ from dataclasses import dataclass
 from struct import Struct
 
 
+def deserialize_packet(payload: bytes):
+    assert payload[3] in DESERIALIZERS, f"{hex(payload[3])} is not a known type. payload: {payload.hex()}"
+    return DESERIALIZERS[payload[3]].unpack(payload)
+
+
 @dataclass
 class Packet:
     preamble = bytes.fromhex('A53C96')
@@ -150,7 +155,6 @@ class TXDeviceParametersPacket(Packet):
         if payload[9] == 0x52:
             return cls(cls.type, cls.version, int.from_bytes(payload[5:8], 'little', signed=False), 0x52)
         elif payload[9] == 0xA2:
-            raise NotImplemented('need sample')
             return cls(*cls.parser.unpack(payload[3:-3]))
         else:
             raise NotImplemented(f'{hex(payload[9])} is not a known flag')
@@ -163,5 +167,22 @@ class TXDeviceParametersPacket(Packet):
                  self.parser.pack(self.type, self.version, self.length, self.flag, self.voltage, self.freq, self.mode,
                                   self.temp)[:7],
                  self.finalizer])
+        elif self.flag == 0xA2:
+            self.length = 16
+            return b''.join(
+                [self.preamble,
+                 self.parser.pack(self.type, self.version, self.length, self.flag, self.voltage, self.freq, self.mode,
+                                  self.temp),
+                 self.finalizer])
         else:
-            raise NotImplemented('no other known yet')
+            raise Exception(f'unknown flag {hex(self.flag)}')
+
+
+
+DESERIALIZERS = {
+    RXStatusPacket.type: RXStatusPacket,
+    RXNoncePacket.type: RXNoncePacket,
+    RXJobResultPacket.type: RXJobResultPacket,
+    TXJobDataPacket.type: TXJobDataPacket,
+    TXDeviceParametersPacket.type: TXDeviceParametersPacket
+}
