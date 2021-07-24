@@ -1,0 +1,14 @@
+[package]
+authors = ["someone <someone@example.com>"]
+name = "lb1ext"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies.pyo3]
+version = "0.14.1"
+features = ["extension-module"]
+
+[lib]
+name = "lb1ext"
+crate-type = ["cdylib"]
+path = "rust_lib/lib.rs"
