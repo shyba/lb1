@@ -66,6 +66,12 @@ class Work:
         final = final + bytes([0] * (136 - len(final)))
         return cls(job.job_id, extra_nonce1, target, 0, None, final, data, time.time(), job.clean)
 
+    def check_nonce(self, nonce):
+        ntime = int.from_bytes(self.raw_data[100:104], 'little')
+        ntime += int.from_bytes(nonce[4:8], 'little')
+        data = self.raw_data[:100] + ntime.to_bytes(4, 'little') + self.raw_data[104:108] + nonce[:4]
+        return proof_of_work(data)[::-1] < self.target
+
 
 def diff_to_target(difficulty: int):
     temp = hex(math.floor(0xffffffff / difficulty))[2:]
@@ -73,6 +79,6 @@ def diff_to_target(difficulty: int):
 
 
 def proof_of_work(header: bytes):
-    initial_hash = hashlib.sha512(sha256d(header))
+    initial_hash = hashlib.sha512(sha256d(header)).digest()
     return sha256d(ripemd160(initial_hash[:len(initial_hash) // 2]) +
                    ripemd160(initial_hash[len(initial_hash) // 2:]))

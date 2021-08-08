@@ -25,3 +25,6 @@ class TestJob(TestCase):
                           18, 91, 109, 129, 196, 32, 41, 208, 26, 245, 96, 41, 83, 1, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        self.assertFalse(work.check_nonce(bytes.fromhex('1e0cb44802000000')))
+        work.target = bytes.fromhex('0000000033333333ffffffffffffffffffffffffffffffffffffffffffffffff')
+        self.assertTrue(work.check_nonce(bytes.fromhex('1e0cb44802000000')))
