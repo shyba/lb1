@@ -10,6 +10,12 @@ def sha256d(payload: bytes) -> bytes:
     return hashlib.sha256(hashlib.sha256(payload).digest()).digest()
 
 
+def ripemd160(payload: bytes) -> bytes:
+    rip = hashlib.new("ripemd160")
+    rip.update(payload)
+    return rip.digest()
+
+
 @dataclass
 class Job:
     job_id: bytes
@@ -51,10 +57,10 @@ class Work:
             merkle_root = sha256d(merkle_root + branch)
         trie_hash = job.trie_hash
         # trie_hash = b''.join([trie_hash[i:i+4][::-1] for i in range(0, len(trie_hash), 4)])
-        merkle_root = b''.join([merkle_root[i:i+4][::-1] for i in range(0, len(merkle_root), 4)])
+        merkle_root = b''.join([merkle_root[i:i + 4][::-1] for i in range(0, len(merkle_root), 4)])
         data = (job.encoded_version + job.previous_hash + merkle_root +
                 trie_hash + job.encoded_time + job.encoded_nbit + b'\x00\x00\x00\x00')
-        data = b''.join([data[i:i+4][::-1] for i in range(0, len(data), 4)])
+        data = b''.join([data[i:i + 4][::-1] for i in range(0, len(data), 4)])
         prehash = bytes(py_sha256_transform(data[:64]))
         final = (prehash + data[64:])
         final = final + bytes([0] * (136 - len(final)))
@@ -64,3 +70,9 @@ class Work:
 def diff_to_target(difficulty: int):
     temp = hex(math.floor(0xffffffff / difficulty))[2:]
     return bytes.fromhex(f"{''.join(['0' * (16 - len(temp))])}{temp}{''.join(['f'] * 48)}")
+
+
+def proof_of_work(header: bytes):
+    initial_hash = hashlib.sha512(sha256d(header))
+    return sha256d(ripemd160(initial_hash[:len(initial_hash) // 2]) +
+                   ripemd160(initial_hash[len(initial_hash) // 2:]))

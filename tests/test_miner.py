@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from miner import Job, Work, diff_to_target
+from lb1miner.miner import Job, Work, diff_to_target
 
 
 class TestJob(TestCase):
