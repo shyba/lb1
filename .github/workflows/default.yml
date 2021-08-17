@@ -1,0 +1,12 @@
+name: Tests
+on: [push]
+jobs:
+    lint:
+        name: test
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-python@v1
+              with:
+                  python-version: '3.7'
+            - pip install -U --user pip wheel setuptools setuptools_rust
+            - python setup.py test
