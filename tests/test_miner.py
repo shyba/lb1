@@ -17,7 +17,7 @@ class TestJob(TestCase):
                           "60f51ad0", True]
         job = Job.from_stratum(*stratum_params)
         target = diff_to_target(262144)
-        work = Work.from_job(job, bytes.fromhex("485fd81a"), 4, target)
+        work = Work.from_job(job, bytes.fromhex("485fd81a"), bytes([0] * 4), target)
         self.assertEqual(list(work.data),
                          [198, 235, 217, 181, 111, 235, 14, 103, 49, 177, 124, 113, 23, 14, 36, 23, 185, 252, 100, 2,
                           90, 15, 83, 210, 183, 110, 65, 247, 129, 47, 243, 163, 112, 197, 250, 46, 88, 52, 122, 178,

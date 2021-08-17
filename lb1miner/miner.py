@@ -50,8 +50,8 @@ class Work:
     clean: bool
 
     @classmethod
-    def from_job(cls, job: Job, extra_nonce1: bytes, extra_nonce2_size: int, target):
-        coinbase = sha256d(job.coinbase1 + extra_nonce1 + (b'\x00' * extra_nonce2_size) + job.coinbase2)
+    def from_job(cls, job: Job, extra_nonce1: bytes, extra_nonce2: bytes, target):
+        coinbase = sha256d(job.coinbase1 + extra_nonce1 + extra_nonce2 + job.coinbase2)
         merkle_root = coinbase
         for branch in job.merkle_root:
             merkle_root = sha256d(merkle_root + branch)
