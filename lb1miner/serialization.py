@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from struct import Struct
+from typing import Dict, Type
 
 
 def deserialize_packet(payload: bytes):
@@ -146,7 +147,9 @@ class TXJobDataPacket(Packet):
         assert payload[-3:] == cls.finalizer
         assert payload[3] == cls.type
         assert payload[4] == cls.version
-        return cls(*cls.parser.unpack(payload[3:35]), job_data=payload[35:-3])
+        packet = cls(*cls.parser.unpack(payload[3:35]))
+        packet.job_data = payload[35:-3]
+        return packet
 
     def pack(self):
         self.length = len(self.job_data) + 32
@@ -244,7 +247,7 @@ class TXRestartPacket(Packet):
         return b''.join([self.preamble, self.parser.pack(self.type, self.version, self.length), self.finalizer])
 
 
-DESERIALIZERS = {
+DESERIALIZERS: Dict[int, Type[Packet]] = {
     RXStatusPacket.type: RXStatusPacket,
     RXNoncePacket.type: RXNoncePacket,
     RXJobResultPacket.type: RXJobResultPacket,
