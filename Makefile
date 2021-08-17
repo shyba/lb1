@@ -1,2 +1,3 @@
 default:
-	pip install -U pip setuptools setuptools_rust mypy pylint==2.4.4
+	pip install -U pip setuptools
+	pip install setuptools_rust mypy pylint==2.9.6

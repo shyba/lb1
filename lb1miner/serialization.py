@@ -171,8 +171,8 @@ class TXDeviceParametersPacket(Packet):
     mode: int = 0
     temp: int = 0
     parser = Struct('<BBIBHHIB')
-    QUERY = 0x52
-    SET = 0xA2
+    QUERY = 0x52  # pylint: disable=invalid-name
+    SET = 0xA2   # pylint: disable=invalid-name
 
     @classmethod
     def unpack(cls, payload: bytes):
