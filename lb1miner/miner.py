@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import List
 import hashlib
 
-from lb1ext.lb1ext import py_sha256_transform  # pylint: disable=no-name-in-module
+from lb1ext.lb1ext import py_sha256_transform  # pylint: disable=no-name-in-module, import-error
 
 
 def sha256d(payload: bytes) -> bytes:
