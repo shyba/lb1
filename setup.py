@@ -15,5 +15,8 @@ setup(
     packages=["lb1miner"],
     include_package_data=True,
     rust_extensions=[RustExtension("lb1ext.lb1ext", "Cargo.toml", debug=False)],
+    install_requires=[
+        'aiorpcX==0.18.7'
+    ],
     zip_safe=False,
 )
