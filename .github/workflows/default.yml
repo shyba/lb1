@@ -11,6 +11,7 @@ jobs:
                   python-version: '3.7'
             - run: make
             - run: mypy --ignore-missing-imports lb1miner
+            - run: pylint --rcfile=setup.cfg lb1miner
 
     test:
         name: test
