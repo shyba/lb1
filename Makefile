@@ -1,2 +1,2 @@
 default:
-	pip install -U pip setuptools setuptools_rust
+	pip install -U pip setuptools setuptools_rust mypy
