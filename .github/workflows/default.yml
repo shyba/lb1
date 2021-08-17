@@ -2,7 +2,7 @@ name: Tests
 on: [push]
 jobs:
     lint:
-        name: test
+        name: lint
         runs-on: ubuntu-18.04
         steps:
             - uses: actions/checkout@v2
