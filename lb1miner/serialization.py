@@ -52,7 +52,7 @@ class RXStatusPacket(Packet):
         return cls(cls.type, cls.version, *cls.parser.unpack(payload[5:-3]))
 
     def pack(self):
-        raise NotImplemented("this packet comes from the device, packing not supported")
+        raise NotImplementedError("this packet comes from the device, packing not supported")
 
 
 @dataclass
@@ -77,7 +77,7 @@ class RXDeviceInformationPacket(Packet):
         return cls(*cls.parser.unpack(payload[3:-3]))
 
     def pack(self):
-        raise NotImplemented("this packet comes from the device, packing not supported")
+        raise NotImplementedError("this packet comes from the device, packing not supported")
 
 
 @dataclass
@@ -101,11 +101,10 @@ class RXNoncePacket(Packet):
         assert payload[4] == cls.version
         if payload[20] == 0:
             return cls(0x51, 0x10, *cls.parser.unpack(payload[5:20]))
-        else:
-            raise NotImplemented('need a sample')
+        raise NotImplementedError('need a sample')
 
     def pack(self):
-        raise NotImplemented("this packet comes from the device, packing not supported")
+        raise NotImplementedError("this packet comes from the device, packing not supported")
 
 
 @dataclass
@@ -125,7 +124,7 @@ class RXJobResultPacket(Packet):
         return cls(0x55, 0x10, *cls.parser.unpack(payload[5:10]))
 
     def pack(self):
-        raise NotImplemented("this packet comes from the device, packing not supported")
+        raise NotImplementedError("this packet comes from the device, packing not supported")
 
 
 @dataclass
@@ -183,10 +182,9 @@ class TXDeviceParametersPacket(Packet):
         assert payload[4] == cls.version
         if payload[9] == cls.QUERY:
             return cls(cls.type, cls.version, int.from_bytes(payload[5:8], 'little', signed=False), 0x52)
-        elif payload[9] == cls.SET:
+        if payload[9] == cls.SET:
             return cls(*cls.parser.unpack(payload[3:-3]))
-        else:
-            raise NotImplemented(f'{hex(payload[9])} is not a known flag')
+        raise NotImplementedError(f'{hex(payload[9])} is not a known flag')
 
     def pack(self):
         if self.flag == self.QUERY:
@@ -196,15 +194,14 @@ class TXDeviceParametersPacket(Packet):
                  self.parser.pack(self.type, self.version, self.length, self.flag, self.voltage, self.freq, self.mode,
                                   self.temp)[:7],
                  self.finalizer])
-        elif self.flag == self.SET:
+        if self.flag == self.SET:
             self.length = 16
             return b''.join(
                 [self.preamble,
                  self.parser.pack(self.type, self.version, self.length, self.flag, self.voltage, self.freq, self.mode,
                                   self.temp),
                  self.finalizer])
-        else:
-            raise Exception(f'unknown flag {hex(self.flag)}')
+        raise Exception(f'unknown flag {hex(self.flag)}')
 
 
 @dataclass
