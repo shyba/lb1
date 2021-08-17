@@ -1,6 +1,7 @@
 import math
 import time
 from dataclasses import dataclass
+from typing import List
 import hashlib
 
 from lb1ext.lb1ext import py_sha256_transform
@@ -23,7 +24,7 @@ class Job:
     trie_hash: bytes
     coinbase1: bytes
     coinbase2: bytes
-    merkle_root: [bytes]
+    merkle_root: List[bytes]
     encoded_version: bytes
     encoded_nbit: bytes
     encoded_time: bytes
@@ -40,7 +41,7 @@ class Job:
 @dataclass
 class Work:
     job_id: bytes
-    nonce: int
+    nonce: bytes
     target: bytes
     hardware_target: bytes
     hardware_difficulty: int
@@ -64,7 +65,7 @@ class Work:
         prehash = bytes(py_sha256_transform(data[:64]))
         final = (prehash + data[64:])
         final = final + bytes([0] * (136 - len(final)))
-        return cls(job.job_id, extra_nonce1, target, 0, None, final, data, time.time(), job.clean)
+        return cls(job.job_id, extra_nonce1, target, bytes(0), 0, final, data, int(time.time()), job.clean)
 
     def check_nonce(self, nonce):
         ntime = int.from_bytes(self.raw_data[100:104], 'little')

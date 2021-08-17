@@ -74,12 +74,6 @@ class RXDeviceInformationPacket(Packet):
         assert payload[3] == cls.type
         assert payload[4] == cls.version
         return cls(*cls.parser.unpack(payload[3:-3]))
-        offset = 10 + packet.model_name_length
-        packet.model_name = payload[10:offset]
-        packet.firmware_version_length = payload[offset + 1]
-        packet.firmware_version = payload[(offset+1):(offset+packet.firmware_version_length)]
-        offset += payload[offset]
-        return packet
 
     def pack(self):
         raise NotImplemented("this packet comes from the device, packing not supported")
@@ -105,10 +99,9 @@ class RXNoncePacket(Packet):
         assert payload[3] == cls.type
         assert payload[4] == cls.version
         if payload[20] == 0:
-            return cls(0x51, 0x10, *cls.parser.unpack(payload[5:20]), has_hash=False)
+            return cls(0x51, 0x10, *cls.parser.unpack(payload[5:20]))
         else:
             raise NotImplemented('need a sample')
-        return packet
 
     def pack(self):
         raise NotImplemented("this packet comes from the device, packing not supported")
