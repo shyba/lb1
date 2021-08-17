@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import List
 import hashlib
 
-from lb1ext.lb1ext import py_sha256_transform
+from lb1ext.lb1ext import py_sha256_transform  # pylint: disable=no-name-in-module
 
 
 def sha256d(payload: bytes) -> bytes:
@@ -32,10 +32,11 @@ class Job:
 
     @classmethod
     def from_stratum(cls, job_id, previous_hash, trie_hash, coinb1, coinb2,
-                     merkle_root, version, bit, time, clean=True):
+                     merkle_root, version, bit, current_time, clean):
         convert = bytes.fromhex
         return cls(convert(job_id), convert(previous_hash), convert(trie_hash), convert(coinb1), convert(coinb2),
-                   [convert(branch) for branch in merkle_root], convert(version), convert(bit), convert(time), clean)
+                   [convert(branch) for branch in merkle_root], convert(version), convert(bit), convert(current_time),
+                   clean)
 
 
 @dataclass
