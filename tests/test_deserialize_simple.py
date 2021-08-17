@@ -88,7 +88,7 @@ DATA = [
 class DeserializeSimpleTestCase(unittest.TestCase):
     def test_deserialize(self):
         for i, message in enumerate(DATA):
-            print(i, deserialize_packet(bytes.fromhex(message)))
+            self.assertIsNotNone(deserialize_packet(bytes.fromhex(message)))
 
 
 if __name__ == '__main__':

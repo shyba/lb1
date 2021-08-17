@@ -8,7 +8,6 @@ class SerializationTestCase(unittest.TestCase):
         packet = RXDeviceInformationPacket.unpack(
             bytes.fromhex('a53c965410360000000d476f6c647368656c6c2d4c423100000005302e302e3100'
                           '00000f4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a00006d31000869c35a'))
-        print(packet)
         self.assertEqual(packet.length, 54)
         self.assertEqual(packet.model_name_length, 13)
         self.assertEqual(packet.model_name, b'Goldshell-LB1\x00\x00\x00')
